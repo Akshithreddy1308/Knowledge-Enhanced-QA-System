@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>QA System</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f8ff;
+        padding: 20px;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        text-align: center;
+        color: #4caf50;
+      }
+      input[type="text"] {
+        width: calc(100% - 80px);
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .chat-box {
+        padding: 10px;
+        background: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        height: 300px;
+        overflow-y: auto;
+        margin-top: 10px;
+      }
+      .current-answer {
+        padding: 10px;
+        margin-top: 10px;
+        background: #e0f7fa;
+        border-radius: 4px;
+        border: 1px solid #b2ebf2;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Knowledge-Enhanced QA System</h1>
+      <input type="text" id="query" placeholder="Ask your question here" />
+      <button onclick="getAnswer()">Submit</button>
+      <div class="current-answer" id="current-answer"></div>
+      <h3>Previous Answers:</h3>
+      <div id="history" class="chat-box"></div>
+    </div>
+    <script>
+      function getAnswer() {
+        const query = document.getElementById("query").value;
+        fetch("/query", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: query }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Display current answer
+            document.getElementById(
+              "current-answer"
+            ).innerHTML = `<p><b>Answer:</b> ${data.response}</p>`;
+
+            // Display previous answers
+            let history = "";
+            data.history.forEach((chat) => {
+              history += `<p><b>Q:</b> ${chat.query}<br><b>A:</b> ${chat.response}</p>`;
+            });
+            document.getElementById("history").innerHTML = history;
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById(
+              "current-answer"
+            ).innerHTML = `<p style="color: red;">Error fetching answer. Please try again.</p>`;
+          });
+      }
+    </script>
+  </body>
+</html>
